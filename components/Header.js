@@ -26,23 +26,23 @@ export default function Header() {
         </Link>
 
         <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
             Home
           </Link>
 
           <div
-            style={{ position: 'relative' }}
+            style={{ position: 'relative', paddingBottom: '16px', marginBottom: '-16px' }}
             onMouseEnter={() => setCitiesOpen(true)}
             onMouseLeave={() => setCitiesOpen(false)}
           >
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px', cursor: 'pointer' }}>
+            <span className="nav-link" style={{ color: 'var(--text-muted)', fontSize: '14px', cursor: 'pointer' }}>
               Cities ▾
             </span>
             {citiesOpen && (
               <div
                 style={{
                   position: 'absolute',
-                  top: '24px',
+                  top: '100%',
                   left: 0,
                   backgroundColor: 'var(--bg-card)',
                   border: '1px solid var(--border)',
@@ -56,6 +56,7 @@ export default function Header() {
                   <Link
                     key={region}
                     href={`/#${region.toLowerCase().replace(' ', '-')}`}
+                    className="dropdown-item"
                     style={{
                       display: 'block',
                       padding: '8px 16px',
@@ -71,17 +72,18 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/compare" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/compare" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
             Compare
           </Link>
-          <Link href="/world-clock" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/world-clock" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
             World Clock
           </Link>
-          <Link href="/about" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/about" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
             About Us
           </Link>
           <button
             onClick={toggleTheme}
+            className="theme-toggle"
             style={{
               background: 'none',
               border: '1px solid var(--border)',

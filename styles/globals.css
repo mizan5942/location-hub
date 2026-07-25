@@ -1,9 +1,3 @@
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #101B2D;
-  color: #F6F3EC;
-}
-
 :root {
   --bg: #101B2D;
   --bg-card: #182640;
@@ -27,18 +21,18 @@ body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   background-color: var(--bg);
   color: var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-display {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-fraunces), serif;
 }
 
 .font-mono-data {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-ibm-plex-mono), monospace;
 }
 
 .city-card {
@@ -54,4 +48,23 @@ body {
 .clock-row:hover {
   transform: translateY(-2px);
   border-color: var(--accent);
+}
+.nav-link {
+  transition: color 0.15s ease;
+}
+.nav-link:hover {
+  color: var(--accent) !important;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.dropdown-item {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.dropdown-item:hover {
+  background-color: var(--bg) !important;
+  color: var(--accent) !important;
 }

@@ -17,16 +17,16 @@ export default function Footer() {
           © {new Date().getFullYear()} Locafacts. All data provided as-is for informational purposes.
         </p>
         <div style={{ display: 'flex', gap: '20px' }}>
-          <Link href="/contact" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
+          <Link href="/contact" className="nav-link" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
             Contact Us
           </Link>
-          <Link href="/disclaimer" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
+          <Link href="/disclaimer" className="nav-link" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
             Disclaimer
           </Link>
-          <Link href="/terms" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
+          <Link href="/terms" className="nav-link" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
             Terms &amp; Conditions
           </Link>
-          <Link href="/privacy-policy" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
+          <Link href="/privacy-policy" className="nav-link" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '13px' }}>
             Privacy Policy
           </Link>
         </div>

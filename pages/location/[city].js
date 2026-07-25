@@ -3,6 +3,8 @@ import cities from '../../data/cities';
 import LiveClock from '../../components/LiveClock';
 import HighlightTile from '../../components/HighlightTile';
 import countryExtras from '../../data/countryExtras';
+import DistanceWidget from '../../components/DistanceWidget';
+import Image from 'next/image';
 
 function DataRow({ label, value }) {
   return (
@@ -31,8 +33,65 @@ function dayLength(sunrise, sunset) {
   const minutes = Math.round((diffMs % 3600000) / 60000);
   return `${hours}h ${minutes}m`;
 }
+function daysUntil(dateStr) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  const diffMs = target - today;
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
 
-export default function CityPage({ cityInfo, weather, currency, airQuality, country, attractions, emergency, cityImage }) {
+function generateFAQs({ cityInfo, weather, currency, country, extras, emergency }) {
+  const currencyCode = country?.currencies?.[0]?.code;
+  const faqs = [];
+
+  if (weather) {
+    faqs.push({
+      q: `What is the current temperature in ${cityInfo.name}?`,
+      a: `As of the latest update, the temperature in ${cityInfo.name} is ${weather.current.temperature_2m}°C, and it feels like ${weather.current.apparent_temperature}°C.`,
+    });
+    faqs.push({
+      q: `What time zone is ${cityInfo.name} in?`,
+      a: `${cityInfo.name} is in the ${weather.timezone} time zone.`,
+    });
+  }
+
+  if (currency && currencyCode) {
+    faqs.push({
+      q: `What currency is used in ${cityInfo.name}?`,
+      a: `${cityInfo.name} uses the ${country.currencies[0].name} (${currencyCode}). Currently, 1 USD equals approximately ${currency.rates[currencyCode]} ${currencyCode}.`,
+    });
+  }
+
+  if (extras) {
+    faqs.push({
+      q: `What voltage and plug type does ${cityInfo.name} use?`,
+      a: `${cityInfo.name} uses ${extras.voltage} at ${extras.frequency}, with plug type(s) ${extras.plugTypes}. Travelers from countries with different standards may need an adapter or converter.`,
+    });
+    faqs.push({
+      q: `What is the nearest major airport to ${cityInfo.name}?`,
+      a: `The nearest major airport is ${extras.airport}.`,
+    });
+  }
+
+  if (emergency) {
+    faqs.push({
+      q: `What is the emergency number in ${cityInfo.name}?`,
+      a: `Police: ${emergency.data.police.all[0]}, Ambulance: ${emergency.data.ambulance.all[0]}, Fire: ${emergency.data.fire.all[0]}.`,
+    });
+  }
+
+  if (country) {
+    faqs.push({
+      q: `What languages are spoken in ${cityInfo.name}?`,
+      a: `The main language(s) spoken are ${country.languages?.map((l) => l.name).join(', ')}.`,
+    });
+  }
+
+  return faqs;
+}
+
+export default function CityPage({ cityInfo, weather, currency, airQuality, country, attractions, emergency, holidays, cityImage }) {
   const currencyCode = country?.currencies?.[0]?.code;
   const sunrise = weather?.daily?.sunrise?.[0];
   const sunset = weather?.daily?.sunset?.[0];
@@ -46,16 +105,40 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           name="description"
           content={`Live weather, currency exchange rates, air quality, and essential facts for ${cityInfo.name}. Updated automatically.`}
         />
+        {(() => {
+          const faqs = generateFAQs({ cityInfo, weather, currency, country, extras, emergency });
+          if (faqs.length === 0) return null;
+          const schema = {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.map((faq) => ({
+              '@type': 'Question',
+              name: faq.q,
+              acceptedAnswer: { '@type': 'Answer', text: faq.a },
+            })),
+          };
+          return (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            />
+          );
+        })()}
       </Head>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>
-        {cityImage?.thumbnail?.source && (
-          <img
-            src={cityImage.originalimage?.source || cityImage.thumbnail.source}
-            alt={cityInfo.name}
-            style={{ width: '100%', height: '280px', objectFit: 'cover', borderRadius: '14px', marginBottom: '24px' }}
-          />
-        )}
+       {cityImage?.thumbnail?.source && (
+  <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '14px', overflow: 'hidden', marginBottom: '24px' }}>
+    <Image
+      src={cityImage.originalimage?.source || cityImage.thumbnail.source}
+      alt={cityInfo.name}
+      fill
+      style={{ objectFit: 'cover' }}
+      sizes="(max-width: 900px) 100vw, 900px"
+      priority
+    />
+  </div>
+)}
 
         <p className="font-mono-data" style={{ color: 'var(--gold)', letterSpacing: '0.1em', fontSize: '13px', marginBottom: '8px' }}>
           {cityInfo.latitude.toFixed(2)}°N, {cityInfo.longitude.toFixed(2)}°E
@@ -123,19 +206,35 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           <DataRow label="Fire" value={emergency && emergency.data.fire.all[0]} />
         </Card>
         <Card title="Travel Essentials" icon="🔌">
-          <DataRow label="Voltage" value={extras?.voltage} />
-          <DataRow label="Plug Types" value={extras?.plugTypes} />
-          <DataRow label="Frequency" value={extras?.frequency} />
-          <DataRow label="Nearest Major Airport" value={extras?.airport} />
-        </Card>
+        <DataRow label="Voltage" value={extras?.voltage} />
+         <DataRow label="Driving Side" value={extras?.drivingSide} />
+         <DataRow label="Plug Types" value={extras?.plugTypes} />
+         <DataRow label="Frequency" value={extras?.frequency} />
+        <DataRow label="Nearest Major Airport" value={extras?.airport} />
+         </Card>
+
+<DistanceWidget currentCity={cityInfo} />
+
+        {holidays && holidays.length > 0 && (
+          <Card title="Upcoming Public Holidays" icon="🎉">
+            {holidays.slice(0, 3).map((holiday) => (
+              <DataRow
+                key={holiday.date}
+                label={holiday.localName}
+                value={`${holiday.date} (${daysUntil(holiday.date)} days)`}
+              />
+            ))}
+          </Card>
+        )}
 
         <Card title="Nearby Points of Interest" icon="📍">
           <iframe
             title="City map"
             width="100%"
             height="260"
+            loading="lazy"
             style={{ border: 0, borderRadius: '8px' }}
-            src={`https://www.openstreetmap.org/export/embed.html?bbox=${cityInfo.longitude - 0.08}%2C${cityInfo.latitude - 0.08}%2C${cityInfo.longitude + 0.08}%2C${cityInfo.latitude + 0.08}&marker=${cityInfo.latitude}%2C${cityInfo.longitude}`}
+         src={`https://www.openstreetmap.org/export/embed.html?bbox=${cityInfo.longitude - 0.08}%2C${cityInfo.latitude - 0.08}%2C${cityInfo.longitude + 0.08}%2C${cityInfo.latitude + 0.08}&marker=${cityInfo.latitude}%2C${cityInfo.longitude}`}
           />
           <p style={{ fontSize: '12px', color: 'var(--text-dim)', margin: '6px 0 16px' }}>
             <a href={`https://www.openstreetmap.org/fixthemap?lat=${cityInfo.latitude}&lon=${cityInfo.longitude}&zoom=15`} style={{ color: 'var(--text-dim)' }}>Report a problem</a>
@@ -157,6 +256,24 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
             <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Unavailable</p>
           )}
         </Card>
+  {(() => {
+          const faqs = generateFAQs({ cityInfo, weather, currency, country, extras, emergency });
+          if (faqs.length === 0) return null;
+          return (
+            <Card title={`Frequently Asked Questions about ${cityInfo.name}`} icon="❓">
+              {faqs.map((faq, i) => (
+                <div key={i} style={{ marginBottom: '16px' }}>
+                  <p style={{ fontWeight: 600, color: 'var(--text)', fontSize: '14px', marginBottom: '4px' }}>
+                    {faq.q}
+                  </p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                    {faq.a}
+                  </p>
+                </div>
+              ))}
+            </Card>
+          );
+        })()}
       </main>
     </>
   );
@@ -204,12 +321,14 @@ export async function getStaticProps({ params }) {
 
   const emergency = await safeFetch(`https://emergencynumberapi.com/api/country/${cityInfo.countryCode}`);
 
+  const holidays = await safeFetch(`https://date.nager.at/api/v3/NextPublicHolidays/${cityInfo.countryCode}`);
+
   const cityImage = await safeFetch(
     `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cityInfo.name)}`
   );
 
-  return {
-    props: { cityInfo, weather, currency, airQuality, country, attractions, emergency, cityImage },
-    revalidate: 43200,
-  };
+ return {
+  props: { cityInfo, weather, currency, airQuality, country, attractions, emergency, holidays, cityImage },
+  revalidate: 43200,
+};
 }
