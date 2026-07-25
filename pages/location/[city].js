@@ -2,6 +2,7 @@ import Head from 'next/head';
 import cities from '../../data/cities';
 import LiveClock from '../../components/LiveClock';
 import HighlightTile from '../../components/HighlightTile';
+import countryExtras from '../../data/countryExtras';
 
 function DataRow({ label, value }) {
   return (
@@ -35,6 +36,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
   const currencyCode = country?.currencies?.[0]?.code;
   const sunrise = weather?.daily?.sunrise?.[0];
   const sunset = weather?.daily?.sunset?.[0];
+  const extras = countryExtras[cityInfo.countryCode];
 
   return (
     <>
@@ -119,6 +121,12 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           <DataRow label="Police" value={emergency && emergency.data.police.all[0]} />
           <DataRow label="Ambulance" value={emergency && emergency.data.ambulance.all[0]} />
           <DataRow label="Fire" value={emergency && emergency.data.fire.all[0]} />
+        </Card>
+        <Card title="Travel Essentials" icon="🔌">
+          <DataRow label="Voltage" value={extras?.voltage} />
+          <DataRow label="Plug Types" value={extras?.plugTypes} />
+          <DataRow label="Frequency" value={extras?.frequency} />
+          <DataRow label="Nearest Major Airport" value={extras?.airport} />
         </Card>
 
         <Card title="Nearby Points of Interest" icon="📍">
