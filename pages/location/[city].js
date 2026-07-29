@@ -6,6 +6,7 @@ import HighlightTile from '../../components/HighlightTile';
 import countryExtras from '../../data/countryExtras';
 import DistanceWidget from '../../components/DistanceWidget';
 import Image from 'next/image';
+import DiscoverMore from '../../components/DiscoverMore';
 
 function DataRow({ label, value }) {
   return (
@@ -158,6 +159,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
             <DataRow label="Languages" value={country?.languages?.map((l) => l.name).join(', ')} />
             <DataRow label="Calling Code" value={country && `+${country.callingCodes?.[0]}`} />
           </div>
+          <DiscoverMore cityName={cityInfo.name} citySlug={cityInfo.slug} />
         </div>
 
         {/* HIGHLIGHT TILES — 2 column grid */}

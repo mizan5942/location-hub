@@ -5,6 +5,7 @@ import cities from '../../data/cities';
 import countryData from '../../data/countryData';
 import countryExtras from '../../data/countryExtras';
 import { fetchWorldBankData } from '../../lib/worldBank';
+import DiscoverMore from '../../components/DiscoverMore';
 
 function DataRow({ label, value }) {
   return (
@@ -77,6 +78,7 @@ export default function CountryPage({ code, info, extras, worldBank, countryCiti
           <DataRow label="Driving Side" value={extras?.drivingSide} />
           <DataRow label="Voltage" value={extras?.voltage} />
         </div>
+        <DiscoverMore cityName={info.name} citySlug={code} />
 
         <Card title="Population & Demographics" icon="👥">
           {worldBank.population && (
