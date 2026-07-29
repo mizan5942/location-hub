@@ -23,7 +23,7 @@ export default function DistanceWidget({ currentCity }) {
 
   return (
     <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', marginBottom: '20px' }}>
-      <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '12px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <h3 className="font-display" style={{ fontSize: '20px', marginBottom: '12px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span>✈️</span> Distance & Flight Time
       </h3>
 
@@ -37,7 +37,7 @@ export default function DistanceWidget({ currentCity }) {
           border: '1px solid var(--border)',
           backgroundColor: 'var(--bg)',
           color: 'var(--text)',
-          fontSize: '14px',
+          fontSize: '16px',
           marginBottom: '16px',
         }}
       >
@@ -52,14 +52,14 @@ export default function DistanceWidget({ currentCity }) {
       {target && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Distance from {currentCity.name}</span>
-            <span className="font-mono-data" style={{ color: 'var(--text)', fontSize: '14px' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '16px' }}>Distance from {currentCity.name}</span>
+            <span className="font-mono-data" style={{ color: 'var(--text)', fontSize: '16px' }}>
               {distanceKm.toFixed(0)} km ({(distanceKm * 0.621371).toFixed(0)} mi)
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Estimated Flight Time</span>
-            <span className="font-mono-data" style={{ color: 'var(--text)', fontSize: '14px' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '16px' }}>Estimated Flight Time</span>
+            <span className="font-mono-data" style={{ color: 'var(--text)', fontSize: '16px' }}>
               {flightTime.hours}h {flightTime.minutes}m
             </span>
           </div>

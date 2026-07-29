@@ -26,7 +26,7 @@ export default function Header() {
         </Link>
 
         <nav style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link href="/" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
             Home
           </Link>
 
@@ -35,7 +35,7 @@ export default function Header() {
             onMouseEnter={() => setCitiesOpen(true)}
             onMouseLeave={() => setCitiesOpen(false)}
           >
-            <span className="nav-link" style={{ color: 'var(--text-muted)', fontSize: '14px', cursor: 'pointer' }}>
+            <span className="nav-link" style={{ color: 'var(--text-muted)', fontSize: '18px', cursor: 'pointer' }}>
               Cities ▾
             </span>
             {citiesOpen && (
@@ -62,7 +62,7 @@ export default function Header() {
                       padding: '8px 16px',
                       color: 'var(--text)',
                       textDecoration: 'none',
-                      fontSize: '14px',
+                      fontSize: '18px',
                     }}
                   >
                     {region}
@@ -72,15 +72,21 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/compare" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/compare" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
             Compare
           </Link>
-          <Link href="/world-clock" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
-            World Clock
-          </Link>
-          <Link href="/about" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '14px' }}>
-            About Us
-          </Link>
+          <Link href="/world-clock" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
+           World Clock
+        </Link>
+        <Link href="/quiz" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
+  Quiz
+</Link>
+<Link href="/countries" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
+  Countries
+</Link>
+<Link href="/about" className="nav-link" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '18px' }}>
+  About Us
+</Link>
           <button
             onClick={toggleTheme}
             className="theme-toggle"
@@ -91,7 +97,7 @@ export default function Header() {
               padding: '6px 10px',
               color: 'var(--text-muted)',
               cursor: 'pointer',
-              fontSize: '14px',
+              fontSize: '18px',
             }}
           >
             {theme === 'dark' ? '☀️' : '🌙'}

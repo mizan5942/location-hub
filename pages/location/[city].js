@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import cities from '../../data/cities';
 import LiveClock from '../../components/LiveClock';
 import HighlightTile from '../../components/HighlightTile';
@@ -100,7 +101,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
   return (
     <>
       <Head>
-        <title>{cityInfo.name} — Live Weather, Currency & Facts | Locafacts</title>
+        <title>{`${cityInfo.name} — Live Weather, Currency & Facts | Locafacts`}</title>
         <meta
           name="description"
           content={`Live weather, currency exchange rates, air quality, and essential facts for ${cityInfo.name}. Updated automatically.`}
@@ -126,7 +127,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
         })()}
       </Head>
 
-      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>
+      <main className="city-page-container" style={{ margin: '0 auto', padding: '60px 24px' }}>
        {cityImage?.thumbnail?.source && (
   <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '14px', overflow: 'hidden', marginBottom: '24px' }}>
     <Image
@@ -160,7 +161,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
         </div>
 
         {/* HIGHLIGHT TILES — 2 column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '32px' }}>
           <HighlightTile icon="🕐" label="Time Zone" value={weather?.timezone} color="#9FD8B8" />
           <HighlightTile icon="🌅" label="Sunrise" value={sunrise?.slice(11)} color="#F6D67A" />
           <HighlightTile icon="🌇" label="Sunset" value={sunset?.slice(11)} color="#F0A868" />
@@ -168,7 +169,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           <HighlightTile icon="🌡️" label="Temperature" value={weather && `${weather.current.temperature_2m}°C`} sub={weather && `Feels ${weather.current.apparent_temperature}°C`} color="#8FCBE0" />
           <HighlightTile icon="🌬️" label="Air Quality" value={airQuality && `PM2.5: ${airQuality.current.pm2_5}`} color="#B7D89A" />
         </div>
-
+            <div className="card-grid">
         <Card title="Weather Details" icon="🌦️">
           <DataRow label="Humidity" value={weather && `${weather.current.relative_humidity_2m}%`} />
           <DataRow label="Wind Speed" value={weather && `${weather.current.wind_speed_10m} km/h`} />
@@ -190,15 +191,22 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
         </Card>
 
         <Card title="Country Info" icon="🌍">
-          <DataRow label="Region" value={country && country.region} />
-          <DataRow label="Subregion" value={country && country.subregion} />
-          <DataRow label="Population" value={country && country.population?.toLocaleString()} />
-          <DataRow label="Area" value={country && `${country.area?.toLocaleString()} km²`} />
-          <DataRow label="Currency Symbol" value={country && country.currencies?.[0]?.symbol} />
-          <DataRow label="Demonym" value={country && country.demonym} />
-          <DataRow label="Neighboring Countries" value={country && country.borders?.join(', ')} />
-          <DataRow label="Flag" value={country && country.flag} />
-        </Card>
+  <DataRow label="Region" value={country && country.region} />
+  <DataRow label="Subregion" value={country && country.subregion} />
+  <DataRow label="Population" value={country && country.population?.toLocaleString()} />
+  <DataRow label="Area" value={country && `${country.area?.toLocaleString()} km²`} />
+  <DataRow label="Currency Symbol" value={country && country.currencies?.[0]?.symbol} />
+  <DataRow label="Demonym" value={country && country.demonym} />
+  <DataRow label="Neighboring Countries" value={country && country.borders?.join(', ')} />
+  <DataRow label="Flag" value={country && country.flag} />
+  <Link
+    href="/country-codes"
+    className="nav-link"
+    style={{ display: 'inline-block', marginTop: '12px', fontSize: '13px', color: 'var(--accent)', textDecoration: 'none' }}
+  >
+    View calling code & ISO code →
+  </Link>
+</Card>
 
         <Card title="Emergency Numbers" icon="🚨">
           <DataRow label="Police" value={emergency && emergency.data.police.all[0]} />
@@ -212,7 +220,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
          <DataRow label="Frequency" value={extras?.frequency} />
         <DataRow label="Nearest Major Airport" value={extras?.airport} />
          </Card>
-
+         </div>
 <DistanceWidget currentCity={cityInfo} />
 
         {holidays && holidays.length > 0 && (
