@@ -103,39 +103,84 @@ function getResultMessage(score, total) {
 </p>
 
         {!mode && (
-          <div>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>Choose how you want to play:</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div>
-                <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '10px', color: 'var(--text)' }}>By Continent</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                  {continents.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => startQuiz('continent', c)}
-                      style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 16px', color: 'var(--text)', cursor: 'pointer' }}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '10px', color: 'var(--text)' }}>By Country</h3>
-                <select
-                  onChange={(e) => e.target.value && startQuiz('country', e.target.value)}
-                  defaultValue=""
-                  style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)', backgroundColor: 'var(--bg-card)', color: 'var(--text)' }}
-                >
-                  <option value="" disabled>Select a country...</option>
-                  {countryCodes.map((code) => (
-                    <option key={code} value={code}>{countryData[code].flag} {countryData[code].name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
+  <div
+    style={{
+      backgroundColor: 'var(--bg-card)',
+      border: '1px solid var(--border)',
+      borderRadius: '18px',
+      padding: '32px',
+    }}
+  >
+    <p style={{ color: 'var(--text-muted)', marginBottom: '28px', fontSize: '15px' }}>Choose how you want to play:</p>
+
+    <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '14px', color: 'var(--text)' }}>
+      By Continent
+    </h3>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
+      {continents.map((c) => {
+        const icons = {
+          Asia: '🏯',
+          Europe: '🏰',
+          Africa: '🦁',
+          'North America': '🗽',
+          'South America': '🌎',
+          Oceania: '🏝️',
+        };
+        return (
+          <button
+            key={c}
+            onClick={() => startQuiz('continent', c)}
+            style={{
+              backgroundColor: 'var(--bg)',
+              border: '2px solid var(--border)',
+              borderRadius: '12px',
+              padding: '18px 12px',
+              color: 'var(--text)',
+              cursor: 'pointer',
+              textAlign: 'center',
+              transition: 'border-color 0.15s ease, transform 0.1s ease',
+              fontSize: '14px',
+              fontWeight: 600,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          >
+            <div style={{ fontSize: '24px', marginBottom: '8px' }}>{icons[c] || '🌐'}</div>
+            {c}
+          </button>
+        );
+      })}
+    </div>
+
+    <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '14px', color: 'var(--text)' }}>
+      By Country
+    </h3>
+    <select
+      onChange={(e) => e.target.value && startQuiz('country', e.target.value)}
+      defaultValue=""
+      style={{
+        width: '100%',
+        padding: '16px',
+        borderRadius: '12px',
+        border: '2px solid var(--border)',
+        backgroundColor: 'var(--bg)',
+        color: 'var(--text)',
+        fontSize: '15px',
+        cursor: 'pointer',
+        transition: 'border-color 0.15s ease',
+      }}
+      onFocus={(e) => (e.target.style.borderColor = 'var(--accent)')}
+      onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
+    >
+      <option value="" disabled>Select a country...</option>
+      {countryCodes.map((code) => (
+        <option key={code} value={code}>{countryData[code].flag} {countryData[code].name}</option>
+      ))}
+    </select>
+  </div>
+)}
 
         {mode && !finished && questions.length > 0 && (
           <div>
