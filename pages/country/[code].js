@@ -6,6 +6,8 @@ import countryData from '../../data/countryData';
 import countryExtras from '../../data/countryExtras';
 import { fetchWorldBankData } from '../../lib/worldBank';
 import DiscoverMore from '../../components/DiscoverMore';
+import countryIntros from '../../data/countryIntros.json';
+import { autoLinkText } from '../../lib/autoLink';
 
 function DataRow({ label, value }) {
   return (
@@ -39,6 +41,25 @@ function Bar({ label, percent, color, sublabel }) {
       </div>
     </div>
   );
+}
+function renderIntro(text, excludeCountryCode) {
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map((para, i) => {
+    const segments = autoLinkText(para, { excludeCountryCode });
+    return (
+      <p key={i} style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+        {segments.map((seg, j) =>
+          seg.linked ? (
+            <Link key={j} href={seg.href} style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
+              {seg.text}
+            </Link>
+          ) : (
+            <span key={j}>{seg.text}</span>
+          )
+        )}
+      </p>
+    );
+  });
 }
 
 export default function CountryPage({ code, info, extras, worldBank, countryCities }) {
@@ -78,6 +99,11 @@ export default function CountryPage({ code, info, extras, worldBank, countryCiti
           <DataRow label="Driving Side" value={extras?.drivingSide} />
           <DataRow label="Voltage" value={extras?.voltage} />
         </div>
+        {countryIntros[code] && (
+  <div style={{ marginBottom: '32px' }}>
+    {renderIntro(countryIntros[code], code)}
+  </div>
+)}
         <DiscoverMore cityName={info.name} citySlug={code} />
 
         <Card title="Population & Demographics" icon="👥">

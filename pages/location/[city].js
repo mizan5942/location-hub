@@ -7,6 +7,8 @@ import countryExtras from '../../data/countryExtras';
 import DistanceWidget from '../../components/DistanceWidget';
 import Image from 'next/image';
 import DiscoverMore from '../../components/DiscoverMore';
+import cityIntros from '../../data/cityIntros.json';
+import { autoLinkText } from '../../lib/autoLink';
 
 function DataRow({ label, value }) {
   return (
@@ -35,12 +37,33 @@ function dayLength(sunrise, sunset) {
   const minutes = Math.round((diffMs % 3600000) / 60000);
   return `${hours}h ${minutes}m`;
 }
+
 function daysUntil(dateStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const target = new Date(dateStr);
   const diffMs = target - today;
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function renderIntro(text, excludeCityCode, excludeCountryCode) {
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map((para, i) => {
+    const segments = autoLinkText(para, { excludeCityCode, excludeCountryCode });
+    return (
+      <p key={i} style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+        {segments.map((seg, j) =>
+          seg.linked ? (
+            <Link key={j} href={seg.href} style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
+              {seg.text}
+            </Link>
+          ) : (
+            <span key={j}>{seg.text}</span>
+          )
+        )}
+      </p>
+    );
+  });
 }
 
 function generateFAQs({ cityInfo, weather, currency, country, extras, emergency }) {
@@ -129,18 +152,18 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
       </Head>
 
       <main className="city-page-container" style={{ margin: '0 auto', padding: '60px 24px' }}>
-       {cityImage?.thumbnail?.source && (
-  <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '14px', overflow: 'hidden', marginBottom: '24px' }}>
-    <Image
-      src={cityImage.originalimage?.source || cityImage.thumbnail.source}
-      alt={cityInfo.name}
-      fill
-      style={{ objectFit: 'cover' }}
-      sizes="(max-width: 900px) 100vw, 900px"
-      priority
-    />
-  </div>
-)}
+        {cityImage?.thumbnail?.source && (
+          <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '14px', overflow: 'hidden', marginBottom: '24px' }}>
+            <Image
+              src={cityImage.originalimage?.source || cityImage.thumbnail.source}
+              alt={cityInfo.name}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 900px) 100vw, 900px"
+              priority
+            />
+          </div>
+        )}
 
         <p className="font-mono-data" style={{ color: 'var(--gold)', letterSpacing: '0.1em', fontSize: '13px', marginBottom: '8px' }}>
           {cityInfo.latitude.toFixed(2)}°N, {cityInfo.longitude.toFixed(2)}°E
@@ -162,6 +185,12 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           <DiscoverMore cityName={cityInfo.name} citySlug={cityInfo.slug} />
         </div>
 
+        {cityIntros[cityInfo.slug] && (
+          <div style={{ marginBottom: '32px' }}>
+            {renderIntro(cityIntros[cityInfo.slug], cityInfo.slug, cityInfo.countryCode)}
+          </div>
+        )}
+
         {/* HIGHLIGHT TILES — 2 column grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '32px' }}>
           <HighlightTile icon="🕐" label="Time Zone" value={weather?.timezone} color="#9FD8B8" />
@@ -171,59 +200,62 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
           <HighlightTile icon="🌡️" label="Temperature" value={weather && `${weather.current.temperature_2m}°C`} sub={weather && `Feels ${weather.current.apparent_temperature}°C`} color="#8FCBE0" />
           <HighlightTile icon="🌬️" label="Air Quality" value={airQuality && `PM2.5: ${airQuality.current.pm2_5}`} color="#B7D89A" />
         </div>
-            <div className="card-grid">
-        <Card title="Weather Details" icon="🌦️">
-          <DataRow label="Humidity" value={weather && `${weather.current.relative_humidity_2m}%`} />
-          <DataRow label="Wind Speed" value={weather && `${weather.current.wind_speed_10m} km/h`} />
-          <DataRow label="Precipitation" value={weather && `${weather.current.precipitation} mm`} />
-          <DataRow label="UV Index" value={weather && weather.current.uv_index} />
-        </Card>
 
-        <Card title="Air Quality Details" icon="🌬️">
-          <DataRow label="PM2.5" value={airQuality && airQuality.current.pm2_5} />
-          <DataRow label="PM10" value={airQuality && airQuality.current.pm10} />
-          <DataRow label="Ozone" value={airQuality && airQuality.current.ozone} />
-          <DataRow label="Carbon Monoxide" value={airQuality && airQuality.current.carbon_monoxide} />
-        </Card>
+        <div className="card-grid">
+          <Card title="Weather Details" icon="🌦️">
+            <DataRow label="Humidity" value={weather && `${weather.current.relative_humidity_2m}%`} />
+            <DataRow label="Wind Speed" value={weather && `${weather.current.wind_speed_10m} km/h`} />
+            <DataRow label="Precipitation" value={weather && `${weather.current.precipitation} mm`} />
+            <DataRow label="UV Index" value={weather && weather.current.uv_index} />
+          </Card>
 
-        <Card title="Currency" icon="💱">
-          <DataRow label={`1 USD in ${currencyCode || 'local currency'}`} value={currency && currencyCode && currency.rates[currencyCode]} />
-          <DataRow label="1 USD in EUR" value={currency && currency.rates.EUR} />
-          <DataRow label="1 USD in GBP" value={currency && currency.rates.GBP} />
-        </Card>
+          <Card title="Air Quality Details" icon="🌬️">
+            <DataRow label="PM2.5" value={airQuality && airQuality.current.pm2_5} />
+            <DataRow label="PM10" value={airQuality && airQuality.current.pm10} />
+            <DataRow label="Ozone" value={airQuality && airQuality.current.ozone} />
+            <DataRow label="Carbon Monoxide" value={airQuality && airQuality.current.carbon_monoxide} />
+          </Card>
 
-        <Card title="Country Info" icon="🌍">
-  <DataRow label="Region" value={country && country.region} />
-  <DataRow label="Subregion" value={country && country.subregion} />
-  <DataRow label="Population" value={country && country.population?.toLocaleString()} />
-  <DataRow label="Area" value={country && `${country.area?.toLocaleString()} km²`} />
-  <DataRow label="Currency Symbol" value={country && country.currencies?.[0]?.symbol} />
-  <DataRow label="Demonym" value={country && country.demonym} />
-  <DataRow label="Neighboring Countries" value={country && country.borders?.join(', ')} />
-  <DataRow label="Flag" value={country && country.flag} />
-  <Link
-    href="/country-codes"
-    className="nav-link"
-    style={{ display: 'inline-block', marginTop: '12px', fontSize: '13px', color: 'var(--accent)', textDecoration: 'none' }}
-  >
-    View calling code & ISO code →
-  </Link>
-</Card>
+          <Card title="Currency" icon="💱">
+            <DataRow label={`1 USD in ${currencyCode || 'local currency'}`} value={currency && currencyCode && currency.rates[currencyCode]} />
+            <DataRow label="1 USD in EUR" value={currency && currency.rates.EUR} />
+            <DataRow label="1 USD in GBP" value={currency && currency.rates.GBP} />
+          </Card>
 
-        <Card title="Emergency Numbers" icon="🚨">
-          <DataRow label="Police" value={emergency && emergency.data.police.all[0]} />
-          <DataRow label="Ambulance" value={emergency && emergency.data.ambulance.all[0]} />
-          <DataRow label="Fire" value={emergency && emergency.data.fire.all[0]} />
-        </Card>
-        <Card title="Travel Essentials" icon="🔌">
-        <DataRow label="Voltage" value={extras?.voltage} />
-         <DataRow label="Driving Side" value={extras?.drivingSide} />
-         <DataRow label="Plug Types" value={extras?.plugTypes} />
-         <DataRow label="Frequency" value={extras?.frequency} />
-        <DataRow label="Nearest Major Airport" value={extras?.airport} />
-         </Card>
-         </div>
-<DistanceWidget currentCity={cityInfo} />
+          <Card title="Country Info" icon="🌍">
+            <DataRow label="Region" value={country && country.region} />
+            <DataRow label="Subregion" value={country && country.subregion} />
+            <DataRow label="Population" value={country && country.population?.toLocaleString()} />
+            <DataRow label="Area" value={country && `${country.area?.toLocaleString()} km²`} />
+            <DataRow label="Currency Symbol" value={country && country.currencies?.[0]?.symbol} />
+            <DataRow label="Demonym" value={country && country.demonym} />
+            <DataRow label="Neighboring Countries" value={country && country.borders?.join(', ')} />
+            <DataRow label="Flag" value={country && country.flag} />
+            <Link
+              href="/country-codes"
+              className="nav-link"
+              style={{ display: 'inline-block', marginTop: '12px', fontSize: '13px', color: 'var(--accent)', textDecoration: 'none' }}
+            >
+              View calling code & ISO code →
+            </Link>
+          </Card>
+
+          <Card title="Emergency Numbers" icon="🚨">
+            <DataRow label="Police" value={emergency && emergency.data.police.all[0]} />
+            <DataRow label="Ambulance" value={emergency && emergency.data.ambulance.all[0]} />
+            <DataRow label="Fire" value={emergency && emergency.data.fire.all[0]} />
+          </Card>
+
+          <Card title="Travel Essentials" icon="🔌">
+            <DataRow label="Voltage" value={extras?.voltage} />
+            <DataRow label="Driving Side" value={extras?.drivingSide} />
+            <DataRow label="Plug Types" value={extras?.plugTypes} />
+            <DataRow label="Frequency" value={extras?.frequency} />
+            <DataRow label="Nearest Major Airport" value={extras?.airport} />
+          </Card>
+        </div>
+
+        <DistanceWidget currentCity={cityInfo} />
 
         {holidays && holidays.length > 0 && (
           <Card title="Upcoming Public Holidays" icon="🎉">
@@ -244,7 +276,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
             height="260"
             loading="lazy"
             style={{ border: 0, borderRadius: '8px' }}
-         src={`https://www.openstreetmap.org/export/embed.html?bbox=${cityInfo.longitude - 0.08}%2C${cityInfo.latitude - 0.08}%2C${cityInfo.longitude + 0.08}%2C${cityInfo.latitude + 0.08}&marker=${cityInfo.latitude}%2C${cityInfo.longitude}`}
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${cityInfo.longitude - 0.08}%2C${cityInfo.latitude - 0.08}%2C${cityInfo.longitude + 0.08}%2C${cityInfo.latitude + 0.08}&marker=${cityInfo.latitude}%2C${cityInfo.longitude}`}
           />
           <p style={{ fontSize: '12px', color: 'var(--text-dim)', margin: '6px 0 16px' }}>
             <a href={`https://www.openstreetmap.org/fixthemap?lat=${cityInfo.latitude}&lon=${cityInfo.longitude}&zoom=15`} style={{ color: 'var(--text-dim)' }}>Report a problem</a>
@@ -266,7 +298,8 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
             <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Unavailable</p>
           )}
         </Card>
-  {(() => {
+
+        {(() => {
           const faqs = generateFAQs({ cityInfo, weather, currency, country, extras, emergency });
           if (faqs.length === 0) return null;
           return (
@@ -337,8 +370,8 @@ export async function getStaticProps({ params }) {
     `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cityInfo.name)}`
   );
 
- return {
-  props: { cityInfo, weather, currency, airQuality, country, attractions, emergency, holidays, cityImage },
-  revalidate: 43200,
-};
+  return {
+    props: { cityInfo, weather, currency, airQuality, country, attractions, emergency, holidays, cityImage },
+    revalidate: 43200,
+  };
 }

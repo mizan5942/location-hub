@@ -53,21 +53,21 @@ export default function Header() {
                 }}
               >
                 {regions.map((region) => (
-                  <Link
-                    key={region}
-                    href={`/#${region.toLowerCase().replace(' ', '-')}`}
-                    className="dropdown-item"
-                    style={{
-                      display: 'block',
-                      padding: '8px 16px',
-                      color: 'var(--text)',
-                      textDecoration: 'none',
-                      fontSize: '18px',
-                    }}
-                  >
-                    {region}
-                  </Link>
-                ))}
+  <Link
+    key={region}
+    href={`/continent/${region.toLowerCase().replace(' ', '-')}`}
+    className="dropdown-item"
+    style={{
+      display: 'block',
+      padding: '8px 16px',
+      color: 'var(--text)',
+      textDecoration: 'none',
+      fontSize: '14px',
+    }}
+  >
+    {region}
+  </Link>
+))}
               </div>
             )}
           </div>
