@@ -1,6 +1,8 @@
+import { useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
+import { toPng } from 'html-to-image';
 import cities from '../../data/cities';
 import countryData from '../../data/countryData';
 import countryExtras from '../../data/countryExtras';
@@ -8,6 +10,21 @@ import { fetchWorldBankData } from '../../lib/worldBank';
 import DiscoverMore from '../../components/DiscoverMore';
 import countryIntros from '../../data/countryIntros.json';
 import { autoLinkText } from '../../lib/autoLink';
+
+const shareButtonStyle = {
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  padding: '10px',
+  borderRadius: '10px',
+  border: '1px solid var(--border)',
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text)',
+  fontSize: '13px',
+  cursor: 'pointer',
+};
 
 function DataRow({ label, value }) {
   return (
@@ -63,6 +80,68 @@ function renderIntro(text, excludeCountryCode) {
 }
 
 export default function CountryPage({ code, info, extras, worldBank, countryCities }) {
+  const [copied, setCopied] = useState(false);
+  const shareCardRef = useRef(null);
+
+  const handleShare = async () => {
+    const url = `https://locafacts.com/country/${code}`;
+    const shareData = {
+      title: `${info.name} — Locafacts`,
+      text: worldBank.population
+        ? `${info.name}: population ${worldBank.population.value.toLocaleString()}, capital ${info.capital}. Facts on Locafacts.`
+        : `Population, capital, and key facts for ${info.name} on Locafacts.`,
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // user cancelled, ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    if (!shareCardRef.current) return;
+    const dataUrl = await toPng(shareCardRef.current, { backgroundColor: '#101B2D' });
+    const link = document.createElement('a');
+    link.download = `${code.toLowerCase()}-facts.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const handleDownloadText = () => {
+    const lines = [
+      `${info.name} — Country Facts (via Locafacts)`,
+      '',
+      `Capital: ${info.capital}`,
+      `Currency: ${info.currency}`,
+      `Calling Code: ${info.callingCode}`,
+      info.languages ? `Languages: ${info.languages.join(', ')}` : null,
+      extras ? `Driving Side: ${extras.drivingSide}` : null,
+      extras ? `Voltage: ${extras.voltage}` : null,
+      worldBank.population ? `Population: ${worldBank.population.value.toLocaleString()} (${worldBank.population.year})` : null,
+      worldBank.populationDensity ? `Population Density: ${worldBank.populationDensity.value.toFixed(1)} people/km² (${worldBank.populationDensity.year})` : null,
+      worldBank.lifeExpectancy ? `Life Expectancy: ${worldBank.lifeExpectancy.value.toFixed(1)} years (${worldBank.lifeExpectancy.year})` : null,
+      worldBank.birthRate ? `Birth Rate: ${worldBank.birthRate.value.toFixed(1)} per 1,000 (${worldBank.birthRate.year})` : null,
+      worldBank.deathRate ? `Death Rate: ${worldBank.deathRate.value.toFixed(1)} per 1,000 (${worldBank.deathRate.year})` : null,
+      worldBank.agriculturalLand ? `Agricultural Land: ${worldBank.agriculturalLand.value.toFixed(1)}% (${worldBank.agriculturalLand.year})` : null,
+      worldBank.forestLand ? `Forest Land: ${worldBank.forestLand.value.toFixed(1)}% (${worldBank.forestLand.year})` : null,
+      '',
+      `Source: locafacts.com/country/${code}`,
+    ].filter(Boolean).join('\n');
+
+    const blob = new Blob([lines], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${code.toLowerCase()}-facts.txt`;
+    link.click();
+  };
+
   return (
     <>
       <Head>
@@ -91,14 +170,33 @@ export default function CountryPage({ code, info, extras, worldBank, countryCiti
           </h1>
         </div>
 
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '32px' }}>
+        <div ref={shareCardRef} style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', marginBottom: '16px' }}>
           <DataRow label="Capital" value={info.capital} />
           <DataRow label="Currency" value={info.currency} />
           <DataRow label="Calling Code" value={info.callingCode} />
           <DataRow label="Languages" value={info.languages?.join(', ')} />
           <DataRow label="Driving Side" value={extras?.drivingSide} />
           <DataRow label="Voltage" value={extras?.voltage} />
+          {worldBank.population && (
+            <DataRow label="Population" value={`${worldBank.population.value.toLocaleString()} (${worldBank.population.year})`} />
+          )}
+          <p style={{ marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'right' }}>
+            locafacts.com/country/{code}
+          </p>
         </div>
+
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '32px' }}>
+          <button onClick={handleShare} style={shareButtonStyle}>
+            {copied ? '✓ Copied' : '↗ Share'}
+          </button>
+          <button onClick={handleDownloadImage} style={shareButtonStyle}>
+            ⬇ Image
+          </button>
+          <button onClick={handleDownloadText} style={shareButtonStyle}>
+            ⬇ Save (.txt)
+          </button>
+        </div>
+
         {countryIntros[code] && (
   <div style={{ marginBottom: '32px' }}>
     {renderIntro(countryIntros[code], code)}

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
+import { toPng } from 'html-to-image';
 import cities from '../data/cities';
 import countryData from '../data/countryData';
 import { generateQuiz } from '../lib/generateQuiz';
@@ -20,7 +22,38 @@ export default function QuizPage() {
   const [selected, setSelected] = useState(null);
   const [finished, setFinished] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
+  const [copied, setCopied] = useState(false);
   const timerRef = useRef(null);
+  const resultCardRef = useRef(null);
+
+  const handleShare = async () => {
+    const label = mode === 'continent' ? selection : countryData[selection]?.name;
+    const shareData = {
+      title: 'World Facts Quiz — Locafacts',
+      text: `I scored ${score}/${questions.length} on the ${label} World Facts Quiz on Locafacts! Think you can beat me?`,
+      url: 'https://locafacts.com/quiz',
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // user cancelled, ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!resultCardRef.current) return;
+    const dataUrl = await toPng(resultCardRef.current, { backgroundColor: '#101B2D' });
+    const link = document.createElement('a');
+    link.download = `locafacts-quiz-score.png`;
+    link.href = dataUrl;
+    link.click();
+  };
 
   function startQuiz(chosenMode, chosenValue) {
     const generated = generateQuiz(chosenMode, chosenValue, 10);
@@ -95,27 +128,58 @@ function getResultMessage(score, total) {
       </Head>
 
       <main style={{ maxWidth: '700px', margin: '0 auto', padding: '60px 24px' }}>
-        <h1 className="font-display" style={{ fontSize: '36px', marginBottom: '32px', color: 'var(--text)' }}>
-          World Facts Quiz
-        </h1>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '220px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginBottom: '32px',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <Image
+            src="/images/quiz-hero.jpg"
+            alt="World facts geography quiz"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))',
+            }}
+          />
+          <h1
+            className="font-display"
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '24px',
+              fontSize: '36px',
+              color: '#fff',
+              margin: 0,
+            }}
+          >
+            World Facts Quiz
+          </h1>
+        </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1.7', marginBottom: '32px' }}>
-  Think you know your way around the globe? The Locafacts World Facts Quiz puts your knowledge of countries, capitals, currencies, and travel trivia to the test. Choose a continent to face a mix of questions pulled from real cities across Asia, Europe, Africa, the Americas, and Oceania, or pick a single country for a focused round on its capital, currency, and nearest major airport. Every round features multiple-choice questions, a ticking timer to keep things challenging, and a streak counter that rewards consecutive correct answers. Whether you're a seasoned traveler, a geography enthusiast, or just looking for a fun way to learn something new, this quiz offers a quick and engaging way to test yourself. Questions are randomized each time you play, so no two rounds are ever exactly the same — see how high a score and streak you can build.
-</p>
+          Think you know your way around the globe? The Locafacts World Facts Quiz puts your knowledge of countries, capitals, currencies, and travel trivia to the test. Choose a continent to face a mix of questions pulled from real cities across Asia, Europe, Africa, the Americas, and Oceania, or pick a single country for a focused round on its capital, currency, and nearest major airport. Every round features multiple-choice questions, a ticking timer to keep things challenging, and a streak counter that rewards consecutive correct answers. Whether you're a seasoned traveler, a geography enthusiast, or just looking for a fun way to learn something new, this quiz offers a quick and engaging way to test yourself. Questions are randomized each time you play, so no two rounds are ever exactly the same — see how high a score and streak you can build.
+        </p>
 
         {!mode && (
-  <div
-    style={{
-      backgroundColor: 'var(--bg-card)',
-      border: '1px solid var(--border)',
-      borderRadius: '18px',
-      padding: '32px',
-    }}
-  >
-    <p style={{ color: 'var(--text-muted)', marginBottom: '28px', fontSize: '15px' }}>Choose how you want to play:</p>
-
-    <h3 className="font-display" style={{ fontSize: '18px', marginBottom: '14px', color: 'var(--text)' }}>
-      By Continent
-    </h3>
+          <div
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              borderRadius: '18px',
+              padding: '32px',
+            }}
+          >
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
       {continents.map((c) => {
         const icons = {
@@ -232,20 +296,76 @@ function getResultMessage(score, total) {
           </div>
         )}
 
-        {finished && (
+       {finished && (
           <div style={{ textAlign: 'center' }}>
-            <p className="font-display" style={{ fontSize: '28px', marginBottom: '12px', color: 'var(--text)' }}>
-              You scored {score} / {questions.length}
-            </p>
-                <p style={{ color: 'var(--accent)', fontSize: '16px', marginBottom: '16px', fontWeight: 600 }}>
-                     {getResultMessage(score, questions.length)}
-                </p>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '8px' }}>
-              Best streak: {bestStreak}🔥
-            </p>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
-              {mode === 'continent' ? selection : countryData[selection]?.name}
-            </p>
+            <div
+              ref={resultCardRef}
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                padding: '32px 24px',
+                marginBottom: '20px',
+              }}
+            >
+              <p style={{ fontSize: '12px', color: 'var(--gold)', marginBottom: '12px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                Locafacts World Facts Quiz
+              </p>
+              <p className="font-display" style={{ fontSize: '32px', marginBottom: '12px', color: 'var(--text)' }}>
+                {score} / {questions.length}
+              </p>
+              <p style={{ color: 'var(--accent)', fontSize: '16px', marginBottom: '16px', fontWeight: 600 }}>
+                {getResultMessage(score, questions.length)}
+              </p>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '4px' }}>
+                Best streak: {bestStreak}🔥
+              </p>
+              <p style={{ color: 'var(--text-muted)' }}>
+                {mode === 'continent' ? selection : countryData[selection]?.name}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+              <button
+                onClick={handleShare}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--bg-card)',
+                  color: 'var(--text)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                {copied ? '✓ Copied' : '↗ Share Score'}
+              </button>
+              <button
+                onClick={handleDownload}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--bg-card)',
+                  color: 'var(--text)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                ⬇ Download
+              </button>
+            </div>
+
             <button
               onClick={resetQuiz}
               style={{ backgroundColor: 'var(--accent)', border: 'none', borderRadius: '10px', padding: '12px 24px', color: '#fff', fontSize: '15px', cursor: 'pointer' }}

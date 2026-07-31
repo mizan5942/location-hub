@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
+import { toPng } from 'html-to-image';
 import cities from '../data/cities';
 
 async function safeFetch(url) {
@@ -43,9 +45,40 @@ export default function Compare() {
   const [loading, setLoading] = useState(false);
 const [insight, setInsight] = useState(null);
 const [insightLoading, setInsightLoading] = useState(false);
+const [copied, setCopied] = useState(false);
+const resultCardRef = useRef(null);
 
   const cityA = cities.find((c) => c.slug === slugA);
   const cityB = cities.find((c) => c.slug === slugB);
+
+  const handleShare = async () => {
+    const url = `https://locafacts.com/compare?a=${slugA}&b=${slugB}`;
+    const shareData = {
+      title: `${cityA.name} vs ${cityB.name} — Locafacts`,
+      text: `See how ${cityA.name} and ${cityB.name} compare on weather, currency, and air quality.`,
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // user cancelled, ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!resultCardRef.current) return;
+    const dataUrl = await toPng(resultCardRef.current, { backgroundColor: '#101B2D' });
+    const link = document.createElement('a');
+    link.download = `${cityA.name}-vs-${cityB.name}-compare.png`;
+    link.href = dataUrl;
+    link.click();
+  };
 
   const handleCompare = async () => {
   if (!cityA || !cityB) return;
@@ -81,9 +114,45 @@ const [insightLoading, setInsightLoading] = useState(false);
         <meta name="description" content="Compare weather, currency, and air quality between two cities side by side." />
       </Head>
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
-        <h1 className="font-display" style={{ fontSize: '36px', marginBottom: '12px', color: 'var(--text)' }}>
-          Compare Cities
-        </h1>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '220px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginBottom: '32px',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <Image
+            src="/images/compare-hero.jpg"
+            alt="Comparing cities around the world"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))',
+            }}
+          />
+          <h1
+            className="font-display"
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '24px',
+              fontSize: '36px',
+              color: '#fff',
+              margin: 0,
+            }}
+          >
+            Compare Cities
+          </h1>
+        </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '16px', marginBottom: '20px' }}>
   Pick two cities to compare their weather, currency, and air quality side by side.
 </p>
@@ -192,7 +261,8 @@ const [insightLoading, setInsightLoading] = useState(false);
 )}
 
 {dataA && dataB && (
-  <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+  <>
+  <div ref={resultCardRef} style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', paddingBottom: '12px', marginBottom: '8px', borderBottom: '2px solid var(--border)' }}>
               <span></span>
               <span className="font-display" style={{ fontWeight: 600, color: 'var(--text)' }}>{cityA.name}</span>
@@ -207,7 +277,53 @@ const [insightLoading, setInsightLoading] = useState(false);
             <CompareRow label="Capital" valueA={dataA.country?.capital} valueB={dataB.country?.capital} />
             <CompareRow label="Population" valueA={dataA.country?.population?.toLocaleString()} valueB={dataB.country?.population?.toLocaleString()} />
             <CompareRow label="Currency" valueA={currencyCodeA && dataA.currency && `1 USD = ${dataA.currency.rates[currencyCodeA]} ${currencyCodeA}`} valueB={currencyCodeB && dataB.currency && `1 USD = ${dataB.currency.rates[currencyCodeB]} ${currencyCodeB}`} />
+
+            <p style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right' }}>
+              locafacts.com
+            </p>
           </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+            <button
+              onClick={handleShare}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px',
+                borderRadius: '10px',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text)',
+                fontSize: '14px',
+                cursor: 'pointer',
+              }}
+            >
+              {copied ? '✓ Link copied' : '↗ Share'}
+            </button>
+            <button
+              onClick={handleDownload}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px',
+                borderRadius: '10px',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text)',
+                fontSize: '14px',
+                cursor: 'pointer',
+              }}
+            >
+              ⬇ Download Image
+            </button>
+          </div>
+          </>
         )}
       </main>
     </>

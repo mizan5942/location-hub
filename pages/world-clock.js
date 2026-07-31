@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import { List } from 'react-window';
 import cities from '../data/cities';
 import WorldClockRow from '../components/WorldClockRow';
@@ -109,9 +110,45 @@ export default function WorldClock({ citiesWithOffsets }) {
         />
       </Head>
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
-        <h1 className="font-display" style={{ fontSize: '36px', marginBottom: '12px', color: 'var(--text)' }}>
-          World Clock
-        </h1>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '220px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginBottom: '32px',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <Image
+            src="/images/world-clock-hero.jpg"
+            alt="World clock showing time zones around the globe"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))',
+            }}
+          />
+          <h1
+            className="font-display"
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '24px',
+              fontSize: '36px',
+              color: '#fff',
+              margin: 0,
+            }}
+          >
+            World Clock
+          </h1>
+        </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '16px', marginBottom: '24px' }}>
           Current local time in cities around the world, ticking live.
         </p>

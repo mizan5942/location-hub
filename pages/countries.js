@@ -1,10 +1,45 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import countryData from '../data/countryData';
+
+const shareButtonStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '10px 16px',
+  borderRadius: '10px',
+  border: '1px solid var(--border)',
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text)',
+  fontSize: '14px',
+  cursor: 'pointer',
+};
 
 export default function CountriesPage() {
   const [search, setSearch] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = 'https://locafacts.com/countries';
+    const shareData = {
+      title: 'Browse All Countries — Locafacts',
+      text: 'Population, demographics, and key facts for every country on Locafacts.',
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // user cancelled, ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const entries = Object.entries(countryData)
     .map(([code, data]) => ({ code, ...data }))
@@ -67,12 +102,53 @@ export default function CountriesPage() {
       </Head>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>
-        <h1 className="font-display" style={{ fontSize: '36px', marginBottom: '12px', color: 'var(--text)' }}>
-          Countries
-        </h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
-          Population, demographics, and key facts for every country on Locafacts.
-        </p>
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '220px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginBottom: '32px',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <Image
+            src="/images/countries-hero.jpg"
+            alt="Countries around the world"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))',
+            }}
+          />
+          <h1
+            className="font-display"
+            style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '24px',
+              fontSize: '36px',
+              color: '#fff',
+              margin: 0,
+            }}
+          >
+            Countries
+          </h1>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
+          <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+            Population, demographics, and key facts for every country on Locafacts.
+          </p>
+          <button onClick={handleShare} style={shareButtonStyle}>
+            {copied ? '✓ Link copied' : '↗ Share this page'}
+          </button>
+        </div>
 
         <div style={{ marginBottom: '32px' }}>
           <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
@@ -103,28 +179,37 @@ export default function CountriesPage() {
           }}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-          {filtered.map((c) => (
-            <Link
-              key={c.code}
-              href={`/country/${c.code}`}
-              className="city-card"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: '10px',
-                padding: '14px 16px',
-                textDecoration: 'none',
-                color: 'var(--text)',
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>{c.flag}</span>
-              <span style={{ fontSize: '14px' }}>{c.name}</span>
-            </Link>
-          ))}
+        <div
+          className="scroll-box"
+          style={{
+            maxHeight: '600px',
+            overflowY: 'auto',
+            paddingRight: '8px',
+          }}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            {filtered.map((c) => (
+              <Link
+                key={c.code}
+                href={`/country/${c.code}`}
+                className="city-card"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '10px',
+                  padding: '14px 16px',
+                  textDecoration: 'none',
+                  color: 'var(--text)',
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>{c.flag}</span>
+                <span style={{ fontSize: '14px' }}>{c.name}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {filtered.length === 0 && (

@@ -1,5 +1,7 @@
+import { useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { toPng } from 'html-to-image';
 import cities from '../../data/cities';
 import LiveClock from '../../components/LiveClock';
 import HighlightTile from '../../components/HighlightTile';
@@ -9,6 +11,7 @@ import Image from 'next/image';
 import DiscoverMore from '../../components/DiscoverMore';
 import cityIntros from '../../data/cityIntros.json';
 import { autoLinkText } from '../../lib/autoLink';
+
 
 function DataRow({ label, value }) {
   return (
@@ -122,6 +125,84 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
   const sunset = weather?.daily?.sunset?.[0];
   const extras = countryExtras[cityInfo.countryCode];
 
+  const [copied, setCopied] = useState(false);
+  const shareCardRef = useRef(null);
+
+  const handleShare = async () => {
+    const url = `https://locafacts.com/location/${cityInfo.slug}`;
+    const shareData = {
+      title: `${cityInfo.name} — Locafacts`,
+      text: weather
+        ? `${cityInfo.name} right now: ${weather.current.temperature_2m}°C. Check live weather, currency, and facts on Locafacts.`
+        : `Live weather, currency, and facts for ${cityInfo.name} on Locafacts.`,
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // user cancelled, ignore
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    if (!shareCardRef.current) return;
+    const dataUrl = await toPng(shareCardRef.current, { backgroundColor: '#101B2D' });
+    const link = document.createElement('a');
+    link.download = `${cityInfo.slug}-facts.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const handleDownloadText = () => {
+    const lines = [
+      `${cityInfo.name} — Quick Facts (via Locafacts)`,
+      '',
+      weather ? `Temperature: ${weather.current.temperature_2m}°C (feels like ${weather.current.apparent_temperature}°C)` : null,
+      weather ? `Humidity: ${weather.current.relative_humidity_2m}%` : null,
+      weather ? `Wind Speed: ${weather.current.wind_speed_10m} km/h` : null,
+      weather ? `Time Zone: ${weather.timezone}` : null,
+      airQuality ? `Air Quality (PM2.5): ${airQuality.current.pm2_5}` : null,
+      country ? `Country: ${country.name?.common || country.name}` : null,
+      country ? `Capital: ${country.capital}` : null,
+      country && currencyCode ? `Currency: ${country.currencies?.[0]?.name} (${currencyCode})` : null,
+      country?.languages ? `Languages: ${country.languages.map((l) => l.name).join(', ')}` : null,
+      country ? `Calling Code: +${country.callingCodes?.[0]}` : null,
+      extras ? `Voltage: ${extras.voltage} (${extras.frequency}), Plug Types: ${extras.plugTypes}` : null,
+      extras ? `Driving Side: ${extras.drivingSide}` : null,
+      extras ? `Nearest Major Airport: ${extras.airport}` : null,
+      emergency ? `Emergency — Police: ${emergency.data.police.all[0]}, Ambulance: ${emergency.data.ambulance.all[0]}, Fire: ${emergency.data.fire.all[0]}` : null,
+      '',
+      `Source: locafacts.com/location/${cityInfo.slug}`,
+    ].filter(Boolean).join('\n');
+
+    const blob = new Blob([lines], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${cityInfo.slug}-facts.txt`;
+    link.click();
+  };
+
+  const shareButtonStyle = {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    padding: '10px',
+    borderRadius: '10px',
+    border: '1px solid var(--border)',
+    backgroundColor: 'var(--bg-card)',
+    color: 'var(--text)',
+    fontSize: '13px',
+    cursor: 'pointer',
+  };
+
   return (
     <>
       <Head>
@@ -173,15 +254,36 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
         </h1>
 
         {/* CLOCK + QUICK FACTS */}
+        {/* CLOCK + QUICK FACTS */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
           {weather && <LiveClock utcOffsetSeconds={weather.utc_offset_seconds} cityName={cityInfo.name} />}
-          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+          <div ref={shareCardRef} style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+            <p className="font-display" style={{ fontSize: '18px', color: 'var(--text)', marginBottom: '12px' }}>
+              {cityInfo.name}
+            </p>
+            <DataRow label="Temperature" value={weather && `${weather.current.temperature_2m}°C (feels ${weather.current.apparent_temperature}°C)`} />
             <DataRow label="Country" value={country?.name?.common || country?.name} />
             <DataRow label="Capital" value={country?.capital} />
             <DataRow label="Currency" value={country && `${country.currencies?.[0]?.name} (${currencyCode})`} />
             <DataRow label="Languages" value={country?.languages?.map((l) => l.name).join(', ')} />
             <DataRow label="Calling Code" value={country && `+${country.callingCodes?.[0]}`} />
+            <p style={{ marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)', textAlign: 'right' }}>
+              locafacts.com/location/{cityInfo.slug}
+            </p>
           </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={handleShare} style={shareButtonStyle}>
+              {copied ? '✓ Copied' : '↗ Share'}
+            </button>
+            <button onClick={handleDownloadImage} style={shareButtonStyle}>
+              ⬇ Image
+            </button>
+            <button onClick={handleDownloadText} style={shareButtonStyle}>
+              ⬇ Save (.txt)
+            </button>
+          </div>
+
           <DiscoverMore cityName={cityInfo.name} citySlug={cityInfo.slug} />
         </div>
 
