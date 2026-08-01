@@ -10,6 +10,8 @@ import { fetchWorldBankData } from '../../lib/worldBank';
 import DiscoverMore from '../../components/DiscoverMore';
 import countryIntros from '../../data/countryIntros.json';
 import { autoLinkText } from '../../lib/autoLink';
+import { canonicalUrl } from '../../lib/seo';
+
 
 const shareButtonStyle = {
   flex: 1,
@@ -150,6 +152,7 @@ export default function CountryPage({ code, info, extras, worldBank, countryCiti
           name="description"
           content={`Population, life expectancy, currency, calling code, and key facts about ${info.name}.`}
         />
+        <link rel="canonical" href={canonicalUrl(`/country/${code}`)} />
       </Head>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>

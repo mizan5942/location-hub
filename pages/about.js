@@ -401,7 +401,7 @@ export default function About() {
 
             <p style={paragraphStyle}>
               Your use of Locafacts is also governed by our{' '}
-              <a href="/terms-and-conditions" style={linkStyle}>
+              <a href="/terms" style={linkStyle}>
                 Terms and Conditions
               </a>
               .

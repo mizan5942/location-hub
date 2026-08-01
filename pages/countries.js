@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
 import countryData from '../data/countryData';
+import { canonicalUrl } from '../lib/seo';
 
 const shareButtonStyle = {
   display: 'flex',
@@ -85,6 +86,7 @@ export default function CountriesPage() {
       <Head>
         <title>Browse All Countries | Locafacts</title>
         <meta name="description" content="Explore population, demographics, currency, and key facts for every country covered on Locafacts." />
+        <link rel="canonical" href={canonicalUrl('/countries')} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -6,6 +6,8 @@ import cities from '../../data/cities';
 import countryData from '../../data/countryData';
 import continentIntros from '../../data/continentIntros.json';
 import { autoLinkText } from '../../lib/autoLink';
+import { canonicalUrl } from '../../lib/seo';
+
 
 function renderIntro(text) {
   const paragraphs = text.split(/\n\n+/);
@@ -62,6 +64,7 @@ export default function ContinentPage({ continentName, continentSlug, continentC
           name="description"
           content={`Explore cities and countries across ${continentName}, with live weather, currency, and travel facts.`}
         />
+        <link rel="canonical" href={canonicalUrl(`/continent/${continentSlug}`)} />
       </Head>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>

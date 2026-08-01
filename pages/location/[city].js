@@ -11,6 +11,7 @@ import Image from 'next/image';
 import DiscoverMore from '../../components/DiscoverMore';
 import cityIntros from '../../data/cityIntros.json';
 import { autoLinkText } from '../../lib/autoLink';
+import { canonicalUrl } from '../../lib/seo';
 
 
 function DataRow({ label, value }) {
@@ -207,10 +208,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
     <>
       <Head>
         <title>{`${cityInfo.name} — Live Weather, Currency & Facts | Locafacts`}</title>
-        <meta
-          name="description"
-          content={`Live weather, currency exchange rates, air quality, and essential facts for ${cityInfo.name}. Updated automatically.`}
-        />
+        <link rel="canonical" href={canonicalUrl(`/location/${cityInfo.slug}`)} />
         {(() => {
           const faqs = generateFAQs({ cityInfo, weather, currency, country, extras, emergency });
           if (faqs.length === 0) return null;
@@ -252,8 +250,7 @@ export default function CityPage({ cityInfo, weather, currency, airQuality, coun
         <h1 className="font-display" style={{ fontSize: '40px', marginBottom: '32px', color: 'var(--text)' }}>
           {cityInfo.name}
         </h1>
-
-        {/* CLOCK + QUICK FACTS */}
+        
         {/* CLOCK + QUICK FACTS */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
           {weather && <LiveClock utcOffsetSeconds={weather.utc_offset_seconds} cityName={cityInfo.name} />}

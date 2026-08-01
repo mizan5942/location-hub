@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { List } from 'react-window';
 import cities from '../data/cities';
 import WorldClockRow from '../components/WorldClockRow';
+import { canonicalUrl } from '../lib/seo';
 
 const continentOrder = ['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania'];
 
@@ -89,6 +90,7 @@ export default function WorldClock({ citiesWithOffsets }) {
       <Head>
         <title>World Clock — Locafacts</title>
         <meta name="description" content="Current local time in cities around the world, updated live." />
+        <link rel="canonical" href={canonicalUrl('/world-clock')} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -212,7 +214,7 @@ export default function WorldClock({ citiesWithOffsets }) {
   rowCount={flatRows.length}
   rowHeight={90}
   rowProps={{ flatRows, columnCount }}
-  style={{ height: 800, width: '100%', paddingTop: '10px', paddingbottom:'10px', }}
+  style={{ height: 800, width: '100%', paddingTop: '10px', paddingBottom:'10px', }}
 />
         </div>
 

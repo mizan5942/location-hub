@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { toPng } from 'html-to-image';
 import cities from '../data/cities';
+import { canonicalUrl } from '../lib/seo';
 
 async function safeFetch(url) {
   try {
@@ -112,6 +113,7 @@ const resultCardRef = useRef(null);
       <Head>
         <title>Compare Cities — Locafacts</title>
         <meta name="description" content="Compare weather, currency, and air quality between two cities side by side." />
+        <link rel="canonical" href={canonicalUrl('/compare')} />
       </Head>
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '60px 24px' }}>
         <div

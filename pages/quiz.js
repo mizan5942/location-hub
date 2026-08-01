@@ -5,6 +5,7 @@ import { toPng } from 'html-to-image';
 import cities from '../data/cities';
 import countryData from '../data/countryData';
 import { generateQuiz } from '../lib/generateQuiz';
+import { canonicalUrl } from '../lib/seo';
 
 const continents = [...new Set(cities.map((c) => c.continent))];
 const countryCodes = [...new Set(cities.map((c) => c.countryCode))].filter((code) => countryData[code]);
@@ -125,6 +126,7 @@ function getResultMessage(score, total) {
       <Head>
         <title>World Facts Quiz | Locafacts</title>
         <meta name="description" content="Test your knowledge of world cities, capitals, currencies, and more." />
+        <link rel="canonical" href={canonicalUrl('/quiz')} />
       </Head>
 
       <main style={{ maxWidth: '700px', margin: '0 auto', padding: '60px 24px' }}>

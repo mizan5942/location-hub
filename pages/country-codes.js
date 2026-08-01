@@ -3,6 +3,7 @@ import cities from '../data/cities';
 import { useState } from 'react';
 import Head from 'next/head';
 import countryData from '../data/countryData';
+import { canonicalUrl } from '../lib/seo';
 
 function findCityForCountry(countryCode, capitalName) {
   const countryCities = cities.filter((c) => c.countryCode === countryCode);
@@ -31,6 +32,7 @@ export default function CountryCodesPage() {
           name="description"
           content="Complete list of country calling codes and ISO codes, with capital cities and flags for every country."
         />
+        <link rel="canonical" href={canonicalUrl('/country-codes')} />
       </Head>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '60px 24px' }}>

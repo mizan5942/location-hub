@@ -539,7 +539,7 @@ export default function Disclaimer() {
 
             <p style={paragraphStyle}>
               Your use of Locafacts is also subject to our{' '}
-              <a href="/terms-and-conditions" style={linkStyle}>
+              <a href="/terms" style={linkStyle}>
                 Terms and Conditions
               </a>{' '}
               and{' '}

@@ -28,7 +28,7 @@ export default function Terms() {
 
         <link
           rel="canonical"
-          href="https://locafacts.com/terms-and-conditions"
+          href="https://locafacts.com/terms"
         />
       </Head>
 

@@ -84,7 +84,7 @@ export default function PrivacyPolicy() {
 
           <p style={paragraphStyle}>
             In this policy, “Locafacts,” “we,” “us,” and “our” refer to the
-            Locafacts website and its owner, YOUR FULL NAME.
+            Locafacts website and its owner, Mizanur Rahaman.
           </p>
 
           <p style={paragraphStyle}>
@@ -466,7 +466,7 @@ export default function PrivacyPolicy() {
             <p style={paragraphStyle}>
               Location facts and other information supplied by third-party APIs
               are provided for informational purposes. Please review our{' '}
-              <a href="/terms-and-conditions" style={linkStyle}>
+              <a href="/terms" style={linkStyle}>
                 Terms and Conditions
               </a>{' '}
               for information about third-party data accuracy and permitted
