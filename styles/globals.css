@@ -35,6 +35,18 @@ body {
   font-family: var(--font-ibm-plex-mono), monospace;
 }
 
+.body-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.label-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .city-card {
   transition: transform 0.15s ease, border-color 0.15s ease;
 }

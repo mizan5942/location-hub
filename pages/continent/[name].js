@@ -81,6 +81,7 @@ export default function ContinentPage({ continentName, continentSlug, continentC
             src={`/images/continents/${continentSlug}.jpg`}
             alt={`${continentName} landscape`}
             fill
+            sizes="(max-width: 900px) 100vw, 900px"
             style={{ objectFit: 'cover' }}
             priority
           />

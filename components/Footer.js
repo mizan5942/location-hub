@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const linkStyle = {
   color: 'var(--text-dim)',
@@ -44,11 +45,19 @@ export default function Footer() {
           {/* BLOCK 1: Logo + text */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-              {/* Logo placeholder — swap src once logo is ready */}
-              {/* <Image src="/images/logo.png" alt="Locafacts" width={32} height={32} /> */}
+              <Image
+                src="/images/logo-dark.png"
+                alt="Locafacts"
+                width={40}
+                height={40}
+                style={{
+                  height: '32px',
+                  width: '32px',
+                }}
+              />
               <span
                 className="font-display"
-                style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text)' }}
+                style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)' }}
               >
                 Locafacts
               </span>

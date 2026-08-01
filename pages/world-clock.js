@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { List } from 'react-window';
@@ -17,7 +17,7 @@ async function safeFetch(url) {
   }
 }
 
-function Row({ index, style, flatRows }) {
+function Row({ index, style, flatRows, columnCount }) {
   const row = flatRows[index];
   if (!row) return null;
 
@@ -32,7 +32,7 @@ function Row({ index, style, flatRows }) {
   }
 
   return (
-    <div style={{ ...style, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', padding: '4px' }}>
+    <div style={{ ...style, display: 'grid', gridTemplateColumns: `repeat(${columnCount}, 1fr)`, gap: '12px', padding: '4px' }}>
       {row.cities.map((city, i) =>
         city ? (
           <WorldClockRow key={city.slug} city={city} utcOffsetSeconds={city.utcOffsetSeconds} />
@@ -46,6 +46,14 @@ function Row({ index, style, flatRows }) {
 
 export default function WorldClock({ citiesWithOffsets }) {
   const [search, setSearch] = useState('');
+  const [columnCount, setColumnCount] = useState(2);
+
+  useEffect(() => {
+    const updateColumns = () => setColumnCount(window.innerWidth < 640 ? 1 : 2);
+    updateColumns();
+    window.addEventListener('resize', updateColumns);
+    return () => window.removeEventListener('resize', updateColumns);
+  }, []);
 
   const filtered = useMemo(
     () => citiesWithOffsets.filter((c) => c.name.toLowerCase().includes(search.toLowerCase())),
@@ -65,12 +73,16 @@ export default function WorldClock({ citiesWithOffsets }) {
       const list = grouped[continent];
       if (!list || list.length === 0) return;
       rows.push({ type: 'header', continent });
-      for (let i = 0; i < list.length; i += 2) {
-        rows.push({ type: 'city-pair', cities: [list[i], list[i + 1] || null] });
+      for (let i = 0; i < list.length; i += columnCount) {
+        const chunk = [];
+        for (let j = 0; j < columnCount; j++) {
+          chunk.push(list[i + j] || null);
+        }
+        rows.push({ type: 'city-pair', cities: chunk });
       }
     });
     return rows;
-  }, [filtered]);
+  }, [filtered, columnCount]);
 
   return (
     <>
@@ -121,10 +133,11 @@ export default function WorldClock({ citiesWithOffsets }) {
             border: '1px solid var(--border)',
           }}
         >
-          <Image
+         <Image
             src="/images/world-clock-hero.jpg"
             alt="World clock showing time zones around the globe"
             fill
+            sizes="(max-width: 760px) 100vw, 760px"
             style={{ objectFit: 'cover' }}
             priority
           />
@@ -154,13 +167,13 @@ export default function WorldClock({ citiesWithOffsets }) {
         </p>
 
         <div style={{ marginBottom: '40px' }}>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             A world clock is one of the simplest tools for dealing with the fact that the planet runs on more than twenty different time zones at once. Instead of doing mental math or searching for each city individually, this page lists the current local time for every city Locafacts covers, grouped by continent and updated in real time as you watch it.
           </p>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             Time zones exist because the earth rotates, and each region sets its clocks to roughly match when the sun is overhead at midday. Most countries also observe a fixed offset from UTC, though some shift that offset twice a year for daylight saving time. That single detail is often the reason a meeting invite ends up an hour off from what someone expected, especially when one side of the call has recently changed their clocks and the other has not.
           </p>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             This is genuinely useful for scheduling a call across continents, figuring out whether a shop or office is likely open before you try contacting them, or just satisfying curiosity about what time it is right now in a city you are thinking about visiting. Search for a specific city above, or scroll through the continent groupings to see how time differs across a whole region at a glance.
           </p>
         </div>
@@ -194,11 +207,11 @@ export default function WorldClock({ citiesWithOffsets }) {
             padding: '0 20px',
           }}
         >
-          <List
+      <List
   rowComponent={Row}
   rowCount={flatRows.length}
   rowHeight={90}
-  rowProps={{ flatRows }}
+  rowProps={{ flatRows, columnCount }}
   style={{ height: 800, width: '100%', paddingTop: '10px', paddingbottom:'10px', }}
 />
         </div>

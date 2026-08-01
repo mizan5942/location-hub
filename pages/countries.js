@@ -117,6 +117,7 @@ export default function CountriesPage() {
             src="/images/countries-hero.jpg"
             alt="Countries around the world"
             fill
+            sizes="(max-width: 900px) 100vw, 900px"
             style={{ objectFit: 'cover' }}
             priority
           />
@@ -151,13 +152,13 @@ export default function CountriesPage() {
         </div>
 
         <div style={{ marginBottom: '32px' }}>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             Every country page on this site pulls together the kind of facts that usually take several separate searches to track down. Population figures, life expectancy, birth and death rates, and land use all come from the World Bank, refreshed on a regular schedule so the numbers stay current rather than frozen at whatever year a textbook happened to be printed.
           </p>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '16px' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             Alongside the demographic data, each profile lists the capital, official currency, calling code, and which side of the road drivers use, the kind of small practical details that matter when you are actually planning a trip rather than just reading trivia. Every country page also links out to the cities Locafacts tracks within it, so you can move from a broad national overview straight down to live weather and currency data for a specific city.
           </p>
-          <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8' }}>
+          <p className="body-text" style={{ marginBottom: '16px' }}>
             Use the search box below to jump straight to a country, or scroll through the full list to browse. Each entry links to a dedicated page with the complete set of population, land use, and travel facts for that country.
           </p>
         </div>
@@ -222,7 +223,7 @@ export default function CountriesPage() {
   <h2 className="font-display" style={{ fontSize: '22px', marginBottom: '12px', color: 'var(--text)' }}>
     Why Country-Level Data Matters
   </h2>
-  <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8' }}>
+  <p className="body-text" style={{ marginBottom: '16px' }}>
     City data tells you what a place feels like right now, but country-level numbers explain the wider context behind it. A city's cost of living, infrastructure, and pace of life are all shaped by national factors like currency stability, population density, and economic policy. Looking at both levels together gives a fuller picture than either one gives alone, especially when comparing places you have never visited against ones you already know well.
   </p>
 </section>
@@ -231,7 +232,7 @@ export default function CountriesPage() {
   <h2 className="font-display" style={{ fontSize: '22px', marginBottom: '12px', color: 'var(--text)' }}>
     How Often This Data Changes
   </h2>
-  <p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8' }}>
+  <p className="body-text" style={{ marginBottom: '16px' }}>
     Country statistics do not move as fast as weather or currency exchange rates, but they are not static either. Population figures shift every year, and land use or life expectancy numbers can change meaningfully over a decade as agriculture, healthcare, or urban development patterns shift. This page pulls the latest reporting year available for each figure directly from the source data, so what you see reflects the most recent numbers published rather than a fixed snapshot from whenever the page was first built.
   </p>
 </section>

@@ -143,6 +143,7 @@ function getResultMessage(score, total) {
             src="/images/quiz-hero.jpg"
             alt="World facts geography quiz"
             fill
+            sizes="(max-width: 700px) 100vw, 700px"
             style={{ objectFit: 'cover' }}
             priority
           />

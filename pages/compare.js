@@ -125,10 +125,11 @@ const resultCardRef = useRef(null);
             border: '1px solid var(--border)',
           }}
         >
-          <Image
+         <Image
             src="/images/compare-hero.jpg"
             alt="Comparing cities around the world"
             fill
+            sizes="(max-width: 760px) 100vw, 760px"
             style={{ objectFit: 'cover' }}
             priority
           />
@@ -157,7 +158,7 @@ const resultCardRef = useRef(null);
   Pick two cities to compare their weather, currency, and air quality side by side.
 </p>
 
-<p style={{ color: 'var(--text)', fontSize: '15px', lineHeight: '1.8', marginBottom: '32px' }}>
+<p className="body-text" style={{ marginBottom: '16px' }}>
   Comparing two cities side by side is one of the fastest ways to plan a trip or understand how different daily life looks around the world. Temperature and air quality numbers alone can tell you whether to pack a jacket or plan indoor activities, while currency and exchange rate differences affect everything from hotel budgets to how far your money stretches on food and transport. This tool pulls live data for both cities at once, so the numbers you see reflect current conditions rather than seasonal averages or outdated estimates. Whether you are choosing between two travel destinations, relocating for work, or simply curious how Tokyo compares to Paris on a random Tuesday, this page gives you a quick, side by side answer.
 </p>
 
@@ -170,7 +171,7 @@ const resultCardRef = useRef(null);
     marginBottom: '32px',
   }}
 >
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '16px', alignItems: 'end' }}>
+  <div className="compare-selectors" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '16px', alignItems: 'end' }}>
     <div>
       <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: 600 }}>City A</label>
       <select
@@ -197,7 +198,7 @@ const resultCardRef = useRef(null);
       </select>
     </div>
 
-    <span className="font-display" style={{ fontSize: '20px', color: 'var(--gold)', paddingBottom: '14px' }}>
+    <span className="font-display vs-label" style={{ fontSize: '20px', color: 'var(--gold)', paddingBottom: '14px' }}>
       vs
     </span>
 
@@ -325,7 +326,22 @@ const resultCardRef = useRef(null);
           </div>
           </>
         )}
-      </main>
+    </main>
+
+      <style jsx>{`
+        @media (max-width: 560px) {
+          .compare-selectors {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .vs-label {
+            padding-bottom: 0 !important;
+            padding-top: 4px;
+            padding-bottom: 4px !important;
+            text-align: center;
+          }
+        }
+      `}</style>
     </>
   );
 }

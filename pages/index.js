@@ -137,7 +137,7 @@ export default function Home() {
         {/* HERO */}
         <section style={{ padding: '90px 0 50px', textAlign: 'center' }}>
          
-          <h1 className="font-display" style={{ fontSize: '52px', fontWeight: 600, marginBottom: '20px', color: 'var(--text)', lineHeight: '1.15' }}>
+          <h1 className="font-display hero-title" style={{ fontWeight: 600, marginBottom: '20px', color: 'var(--text)', lineHeight: '1.15' }}>
             Live facts for every city on Earth
           </h1>
           <LiveClockBadge />
@@ -178,7 +178,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', padding: '28px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px' }}>
+          <div className="stats-bar" style={{ display: 'flex', gap: '16px', padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px' }}>
             <div style={{ textAlign: 'center', flex: 1 }}>
               <p className="font-display" style={{ fontSize: '32px', color: 'var(--gold)', marginBottom: '4px' }}>{cities.length}+</p>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Cities Covered</p>
@@ -230,7 +230,7 @@ export default function Home() {
               <h2 className="font-display" style={{ fontSize: '24px', color: 'var(--text)', marginBottom: '20px' }}>
                 Browse by Continent
               </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+              <div className="continent-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
                 {continentInfo.map((c) => {
                   const count = cities.filter((city) => city.continent === c.name).length;
                   return (
@@ -252,7 +252,7 @@ export default function Home() {
             {/* COUNTRIES PREVIEW — 4 columns */}
             <section style={{ marginBottom: '60px' }}>
               <SectionHeader title="Countries" seeMoreHref="/countries" seeMoreLabel="See more countries" />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+              <div className="preview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                 {previewCountries.map(([code, info]) => (
                   <Link
                     key={code}
@@ -272,7 +272,7 @@ export default function Home() {
             {/* CITIES PREVIEW — 4 columns */}
             <section style={{ marginBottom: '60px' }}>
               <SectionHeader title="Cities" seeMoreHref="/world-clock" seeMoreLabel="See more cities" />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+              <div className="preview-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                 {previewCities.map((city) => (
                   <Link
                     key={city.slug}
@@ -324,7 +324,7 @@ export default function Home() {
           {/* <ins className="adsbygoogle" ...></ins> */}
         </section>
 
-        <section style={{ padding: '20px 0 80px', borderTop: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.7' }}>
+    <section style={{ padding: '20px 0 80px', borderTop: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.7' }}>
           <p>
             Locafacts brings together live weather, currency exchange rates, air quality readings, and
             essential local information for cities across the world — all in one place, updated automatically
@@ -333,6 +333,36 @@ export default function Home() {
           </p>
         </section>
       </main>
+
+      <style jsx>{`
+        .hero-title {
+          font-size: 52px;
+        }
+        .stats-bar {
+          flex-wrap: wrap;
+        }
+        .continent-grid {
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .preview-grid {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        @media (max-width: 640px) {
+          .hero-title {
+            font-size: 32px;
+          }
+          .stats-bar {
+            gap: 10px;
+            padding: 20px 16px;
+          }
+          .continent-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .preview-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
